@@ -1,0 +1,30 @@
+Limit  (cost=18568.21..18568.26 rows=20 width=158) (actual time=60.608..60.617 rows=20.00 loops=1)
+  Buffers: shared hit=4865 read=5205
+  ->  Sort  (cost=18568.21..18569.26 rows=420 width=158) (actual time=60.606..60.612 rows=20.00 loops=1)
+"        Sort Key: (count(*)) DESC, s.song_id"
+        Sort Method: quicksort  Memory: 26kB
+        Buffers: shared hit=4865 read=5205
+        ->  HashAggregate  (cost=18552.84..18557.04 rows=420 width=158) (actual time=60.518..60.532 rows=27.00 loops=1)
+              Group Key: s.song_id
+              Batches: 1  Memory Usage: 48kB
+              Buffers: shared hit=4865 read=5205
+              ->  Hash Join  (cost=311.68..18501.15 rows=10337 width=150) (actual time=9.410..56.254 rows=10040.00 loops=1)
+                    Hash Cond: (p.track_id = s.song_id)
+                    Buffers: shared hit=4865 read=5205
+                    ->  Bitmap Heap Scan on plays p  (cost=292.23..18454.29 rows=10337 width=4) (actual time=9.242..50.120 rows=10040.00 loops=1)
+                          Recheck Cond: ((user_id = 1) AND (played_at >= '2025-01-01 00:00:00'::timestamp without time zone) AND (played_at < '2026-01-01 00:00:00'::timestamp without time zone))
+                          Heap Blocks: exact=10028
+                          Buffers: shared hit=4864 read=5205
+                          ->  Bitmap Index Scan on idx_plays_user_played_at  (cost=0.00..289.64 rows=10337 width=0) (actual time=6.293..6.294 rows=10040.00 loops=1)
+                                Index Cond: ((user_id = 1) AND (played_at >= '2025-01-01 00:00:00'::timestamp without time zone) AND (played_at < '2026-01-01 00:00:00'::timestamp without time zone))
+                                Index Searches: 1
+                                Buffers: shared read=41
+                    ->  Hash  (cost=14.20..14.20 rows=420 width=150) (actual time=0.106..0.107 rows=27.00 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 10kB
+                          Buffers: shared hit=1
+                          ->  Seq Scan on songs s  (cost=0.00..14.20 rows=420 width=150) (actual time=0.072..0.078 rows=27.00 loops=1)
+                                Buffers: shared hit=1
+Planning:
+  Buffers: shared hit=15 read=4
+Planning Time: 0.470 ms
+Execution Time: 60.786 ms

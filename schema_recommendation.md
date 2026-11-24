@@ -1,0 +1,3 @@
+## Schema recommendation
+
+I recommend creating a separate regions table and adding region_id to the listeners table. Since the plays table has millions of records, storing region_code in every row would take up more storage and increase index size. This design needs an extra join but reduces duplicate data and makes updates easier. I can see using the right index can help improve query performance from report a. It also reduces the amount of data stored when new plays are added. But if we need to know the listener's region at the time of each play, we should also store historical region information.

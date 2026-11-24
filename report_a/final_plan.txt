@@ -1,0 +1,27 @@
+Limit  (cost=566.44..566.49 rows=20 width=158) (actual time=11.626..11.639 rows=20.00 loops=1)
+  Buffers: shared hit=5 read=49
+  ->  Sort  (cost=566.44..567.49 rows=420 width=158) (actual time=11.625..11.634 rows=20.00 loops=1)
+"        Sort Key: (count(*)) DESC, s.song_id"
+        Sort Method: quicksort  Memory: 26kB
+        Buffers: shared hit=5 read=49
+        ->  HashAggregate  (cost=551.06..555.26 rows=420 width=158) (actual time=11.594..11.609 rows=27.00 loops=1)
+              Group Key: s.song_id
+              Batches: 1  Memory Usage: 48kB
+              Buffers: shared hit=5 read=49
+              ->  Hash Join  (cost=19.88..498.13 rows=10586 width=150) (actual time=0.643..8.890 rows=10040.00 loops=1)
+                    Hash Cond: (p.track_id = s.song_id)
+                    Buffers: shared hit=5 read=49
+                    ->  Index Only Scan using idx_plays_user_played_at_covering on plays p  (cost=0.43..450.62 rows=10586 width=4) (actual time=0.495..5.217 rows=10040.00 loops=1)
+                          Index Cond: ((user_id = 1) AND (played_at >= '2025-01-01 00:00:00'::timestamp without time zone) AND (played_at < '2026-01-01 00:00:00'::timestamp without time zone))
+                          Heap Fetches: 0
+                          Index Searches: 1
+                          Buffers: shared hit=4 read=49
+                    ->  Hash  (cost=14.20..14.20 rows=420 width=150) (actual time=0.079..0.080 rows=27.00 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 10kB
+                          Buffers: shared hit=1
+                          ->  Seq Scan on songs s  (cost=0.00..14.20 rows=420 width=150) (actual time=0.039..0.055 rows=27.00 loops=1)
+                                Buffers: shared hit=1
+Planning:
+  Buffers: shared hit=3 read=1
+Planning Time: 0.459 ms
+Execution Time: 12.763 ms
